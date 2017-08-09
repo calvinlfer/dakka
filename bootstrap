@@ -1,0 +1,12 @@
+#!/bin/bash
+
+HOST_IP_FILE="/etc/hostip"
+
+if [ -e $HOST_IP_FILE ]
+then
+    export HOST_IP=$(cat $HOST_IP_FILE)    
+fi
+
+export HOST_PORT=$(docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $HOSTNAME)
+
+exec "$@"
