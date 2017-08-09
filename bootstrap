@@ -2,11 +2,16 @@
 
 HOST_IP_FILE="/etc/hostip"
 
-if [ -e $HOST_IP_FILE ]
+if [ -f $HOST_IP_FILE ]
 then
     export HOST_IP=$(cat $HOST_IP_FILE)    
 fi
 
-export HOST_PORT=$(docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $HOSTNAME)
+
+if [[ ! -e "$APP_PORT" ]]
+then
+    PORT_KEY="$APP_PORT/tcp"
+    export HOST_PORT=$(docker inspect --format="{{(index (index .NetworkSettings.Ports \"$PORT_KEY\") 0).HostPort}}" $HOSTNAME)
+fi
 
 exec "$@"
